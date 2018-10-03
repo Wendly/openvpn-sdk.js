@@ -1,0 +1,65 @@
+{
+  "name": "openvpn-sdk",
+  "version": "0.0.7",
+  "description": "Openvpn SDK for JavaScript",
+  "main": "lib/openvpn.js",
+  "author": "Wendly Li <wendly777@gmail.com>",
+  "license": "",
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-core": "^6.26.0",
+    "babel-plugin-flow-runtime": "^0.17.0",
+    "babel-plugin-transform-object-rest-spread": "^6.26.0",
+    "babel-polyfill": "^6.26.0",
+    "babel-preset-env": "^1.6.1",
+    "babel-preset-flow": "^6.23.0",
+    "documentation": "^5.4.0",
+    "eslint": "^4.18.1",
+    "flow-bin": "^0.65.0",
+    "flow-coverage-report": "^0.4.1",
+    "flow-jsdoc": "^0.3.1",
+    "flow-remove-types": "^1.2.3",
+    "flow-typed": "^2.3.0",
+    "jest": "20.0.4",
+    "nock": "^9.1.6",
+    "sonar-scanner": "^3.0.3"
+  },
+  "scripts": {
+    "lint": "yarn run flow check",
+    "build": "yarn run -- babel -d lib src",
+    "relink": "yarn build && (yarn unlink; yarn link)",
+    "deploy": "yarn test && git add lib && git commit -m 'dist' && git push origin dist",
+    "start": "node lib/index.js",
+    "flow-typed-install": "yarn run -- flow-typed install",
+    "coverage": "yarn run flow-coverage-report",
+    "test": "yarn run -- babel -d lib src && yarn run -- jest --coverage lib/openvpn.spec.js",
+    "docs": "yarn run -- documentation build src/** -f html -o docs",
+    "jsdoc2flow": "yarn run -- flow-jsdoc -d ./lib -o ./jsdoc2flow"
+  },
+  "dependencies": {
+    "axios": "^0.17.1",
+    "axios-debug-log": "^0.4.0",
+    "cheerio": "^1.0.0-rc.2",
+    "faker": "^4.1.0",
+    "flow-runtime": "^0.17.0",
+    "flow-runtime-validators": "^0.17.0",
+    "https": "^1.0.0",
+    "immutable": "^3.8.2",
+    "moment": "^2.20.1",
+    "moment-timezone": "^0.5.14",
+    "qs": "^6.5.2",
+    "rxjs": "^5.5.6",
+    "validator": "^9.4.1"
+  },
+  "flow-coverage-report": {
+    "includeGlob": [
+      "src//**/*.js"
+    ],
+    "type": [
+      "text",
+      "html",
+      "json"
+    ],
+    "threshold": 50
+  }
+}
