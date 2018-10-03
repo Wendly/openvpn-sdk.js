@@ -1,6 +1,6 @@
 # Openvpn SDK for JavaScript
 
-[![CircleCI](https://circleci.com/gh/FloTechnologies/openvpn-sdk.js.svg?style=svg&circle-token=ac1313be2c50d5ccd45d66ac6b3135ab45443d51)](https://circleci.com/gh/FloTechnologies/openvpn-sdk.js)
+[![CircleCI](https://circleci.com/gh/Wendly/openvpn-sdk.js.svg?style=svg)](https://circleci.com/gh/Wendly/openvpn-sdk.js)
 
 ## Usage
 
