@@ -6,6 +6,11 @@ import Rx from 'rxjs';
 import axios from 'axios';
 import faker from 'faker';
 import httpAdapter from 'axios/lib/adapters/http'
+import validator from 'validator';
+import {
+  isDomainNameSocket,
+  isIpSocket
+} from './types';
 
 const baseUrl = process.env.OPENVPN_BASE_URL || "";
 const username = process.env.OPENVPN_USER_NAME || "";
@@ -34,4 +39,19 @@ it('should get current users', done => {
     console.error(err);
     done.fail(err);
   });
+});
+
+it('should validate sockets', done => {
+  expect(isDomainNameSocket("172.27.243.60")).toBe(false);
+  expect(isDomainNameSocket("example.com")).toBe(false);
+  expect(isDomainNameSocket("example.com:333")).toBe(true);
+  expect(isDomainNameSocket("172.27.243.60:333")).toBe(false);
+  expect(isDomainNameSocket("example:333")).toBe(false);
+
+  expect(isIpSocket("172.27.243.60")).toBe(false);
+  expect(isIpSocket("example.com")).toBe(false);
+  expect(isIpSocket("example.com:333")).toBe(false);
+  expect(isIpSocket("172.27.243.60:333")).toBe(true);
+  expect(isIpSocket("172.27.243:333")).toBe(false);
+  done();
 });
