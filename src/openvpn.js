@@ -30,49 +30,47 @@ export default class OpenVpn {
   }
 
   login(username: string, password: string): Rx.Observable<string> {
-    return Rx.Observable.fromPromise(this.axios.get("/")).map(res => "").catch(err => {
-      if (err.response.headers["location"] == `${this.axios.defaults.baseURL}__session_start__/`) {
-        const cookie = err.response.headers["set-cookie"][0].split(";")[0];
-        return Rx.Observable.fromPromise(this.axios.get("/__session_start__", {
-          headers: {
-            Cookie: cookie
-          }
-        })).catch(err => {
-          return Rx.Observable.fromPromise(this.axios.get("/", {headers: {Cookie: cookie}}));
-        }).map(res => cookie);
+    return Rx.Observable.fromPromise(this.axios.get("/"))
+    .map(res => "")
+    .catch(err => {
+      if (err.response.headers["location"] != `${this.axios.defaults.baseURL}__session_start__/`) {
+        return Rx.Observable.throw(err);
       }
-      return Rx.Observable.throw(err);
-    }).flatMap(cookie => {
-      return Rx.Observable.fromPromise(this.axios.post("/__login__",
-        qs.stringify({
-          username: username,
-          password: password}), {
-          headers: {
-            Cookie: cookie,
-            "Content-Type": "application/x-www-form-urlencoded"
-          }}));
-    }).catch(err => {
-      return Rx.Observable.of(err.response);
-    }).map(res => {
-      return res.headers["set-cookie"][0].split(";")[0]
-    });
+      const cookie = err.response.headers["set-cookie"][0].split(";")[0];
+      return Rx.Observable.fromPromise(this.axios.get("/__session_start__", { headers: { Cookie: cookie } }))
+      .catch(err => Rx.Observable.fromPromise(this.axios.get("/", {headers: {Cookie: cookie}})))
+      .map(res => cookie);
+    })
+    .flatMap(cookie => {
+      return Rx.Observable.fromPromise(this.axios.post("/__login__", qs.stringify({
+        username: username,
+        password: password
+      }), {
+        headers: {
+          Cookie: cookie,
+          "Content-Type": "application/x-www-form-urlencoded"
+        }
+      }));
+    })
+    .catch(err => Rx.Observable.of(err.response))
+    .map(res => res.headers["set-cookie"][0].split(";")[0]);
   }
 
   getCurrentUsers(cookie: string): Rx.Observable<Array<User>> {
-    return Rx.Observable.fromPromise(this.axios.get("/current_users", {headers: {Cookie: cookie}})).map(res => {
-      let users: Array<User> = [];
+    return Rx.Observable.fromPromise(this.axios.get("/current_users", { headers: { Cookie: cookie } }))
+    .map(res => {
+      const users: Array<User> = [];
       const $ = cheerio.load(res.data);
       $(`table[id="box-current-users-table"] tbody tr`).each((i, elem) => {
         if (i > 0) {
-          const user: User = {
+          users.push({
             name: $(elem).children().eq(0).text(),
             realAddress: $(elem).children().eq(1).text(),
             vpnAddress: $(elem).children().eq(2).text()
-          };
-          users.push(user);
+          });
         }
-      })
-      return users
+      });
+      return users;
     })
   }
 }
