@@ -50,10 +50,11 @@ export default class OpenVpn {
           Cookie: cookie,
           "Content-Type": "application/x-www-form-urlencoded"
         }
-      }));
+      }))
+      .map(res => cookie);
     })
-    .catch(err => Rx.Observable.of(err.response))
-    .map(res => res.headers["set-cookie"][0].split(";")[0]);
+    .catch(err => Rx.Observable.of(err.response).map(res => res.headers["set-cookie"][0].split(";")[0]))
+    ;
   }
 
   getCurrentUsers(cookie: string): Rx.Observable<Array<User>> {
