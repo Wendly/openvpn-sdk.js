@@ -3,6 +3,7 @@
 import Rx from 'rxjs';
 import axios from 'axios';
 import {Axios} from 'axios';
+import type {AxiosPromise} from 'axios';
 import type {
   Email,
   File,
@@ -15,10 +16,16 @@ const https = require('https');
 import qs from 'qs';
 import cheerio from 'cheerio';
 
+//const fromAxiosPromise = <T>(promise: AxiosPromise<T>): Rx.Observable<T> => {
+//  return Rx.Observable.from(promise);
+//};
+
 export default class OpenVpn {
   axios: Axios;
+  url: URL;
 
   constructor(url: URL) {
+    this.url = url;
     this.axios = axios.create({
       baseURL: url,
       httpsAgent: new https.Agent({
@@ -33,7 +40,7 @@ export default class OpenVpn {
     return Rx.Observable.fromPromise(this.axios.get("/"))
     .map(res => "")
     .catch(err => {
-      if (err.response.headers["location"] != `${this.axios.defaults.baseURL}__session_start__/`) {
+      if (err.response.headers["location"] != `${this.url}__session_start__/`) {
         return Rx.Observable.throw(err);
       }
       const cookie = err.response.headers["set-cookie"][0].split(";")[0];
@@ -50,10 +57,11 @@ export default class OpenVpn {
           Cookie: cookie,
           "Content-Type": "application/x-www-form-urlencoded"
         }
-      }));
+      }))
+      .map(res => cookie);
     })
-    .catch(err => Rx.Observable.of(err.response))
-    .map(res => res.headers["set-cookie"][0].split(";")[0]);
+    .catch(err => Rx.Observable.of(err.response).map(res => res.headers["set-cookie"][0].split(";")[0]))
+    ;
   }
 
   getCurrentUsers(cookie: string): Rx.Observable<Array<User>> {
