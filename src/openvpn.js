@@ -67,7 +67,7 @@ export default class OpenVpn {
   getCurrentUsers(cookie: string): Rx.Observable<Array<User>> {
     return Rx.Observable.fromPromise(this.axios.get("/current_users", { headers: { Cookie: cookie } }))
     .catch(err => {
-        if (err.response.status == 302) {
+        if (err.response && err.response.status == 302) {
             const e = new Error("The cached cookie has expired", err);
             e.response = err.response;
             return Rx.Observable.throw(e);
